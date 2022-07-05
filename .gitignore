@@ -2,4 +2,6 @@
 config.h
 config*.h
 .*
-wurbot
+vgcore.*
+obj/*
+ac2ical

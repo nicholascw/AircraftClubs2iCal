@@ -1,5 +1,5 @@
-CFLAGS=-O2 -fPIC -Wall -Wextra -D _GNU_SOURCE -pthread $$(pkg-config --cflags telebot libical)
-LDFLAGS=$$(pkg-config --libs telebot libical)
+CFLAGS=-O2 -fPIC -Wall -Wextra -D _GNU_SOURCE -pthread $$(pkg-config --cflags libical libcurl)
+LDFLAGS=$$(pkg-config --libs libical libcurl)
 TARGET=ac2ical
 SRC=$(wildcard *.c)
 HDR=$(wildcard *.h)
@@ -26,7 +26,7 @@ format:
 	$(foreach n, $(HDR), clang-format -style=google -i $(n); )
 
 clean:
-	$(RM) -r vgcore.* obj $(TARGET) config*.h
+	$(RM) -r vgcore.* obj $(TARGET)
 
 run: $(TARGET)
 	./$(TARGET)
