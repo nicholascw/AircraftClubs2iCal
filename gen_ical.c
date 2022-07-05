@@ -18,8 +18,14 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
                    &dtstart.minute, &start_ampm, &dtend.month, &dtend.day,
                    &dtend.year, &dtend.hour, &dtend.minute, &end_ampm);
   if (ret != 12) return NULL;
-  if (start_ampm == 'p') dtstart.hour += 12;
-  if (end_ampm == 'p') dtend.hour += 12;
+  if (start_ampm == 'p' && dtstart.hour < 12)
+    dtstart.hour += 12;
+  else if (start_ampm == 'a' && dtstart.hour == 12)
+    dtstart.hour = 0;
+  if (end_ampm == 'p' && dtend.hour < 12)
+    dtend.hour += 12;
+  else if (end_ampm == 'a' && dtend.hour == 12)
+    dtend.hour = 0;
 
   int has_aircraft, has_instructor, has_equipment;
   has_aircraft = strcmp(aircraft, "<i>None</i>");
