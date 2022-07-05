@@ -36,7 +36,7 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
   asprintf(&summary, "%s%s%s%s%s", (has_aircraft ? aircraft : ""),
            (has_aircraft && (has_instructor || has_equipment) ? ", with " : ""),
            (has_instructor ? instructor : ""),
-           (has_aircraft || has_instructor ? ", " : ""),
+           (has_equipment && (has_aircraft || has_instructor) ? ", " : ""),
            (has_equipment ? equipment : ""));
 
   icalcomponent *event = icalcomponent_vanew(
