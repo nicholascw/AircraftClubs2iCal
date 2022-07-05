@@ -1,0 +1,5 @@
+.idea/*
+config.h
+config*.h
+.*
+wurbot
