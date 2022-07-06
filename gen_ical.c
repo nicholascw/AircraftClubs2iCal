@@ -86,6 +86,10 @@ icalcomponent *gen_ical(char *tzid, char *tzurl) {
 
 void save_ical(icalcomponent *cal, char *path) {
   FILE *f = fopen(path, "w+");
-  fprintf(f, "%s", icalcomponent_as_ical_string(cal));
-  fclose(f);
+  if (f) {
+    fprintf(f, "%s", icalcomponent_as_ical_string(cal));
+    fclose(f);
+  } else {
+    fprintf(stderr, "Failed to open path %s\n", path);
+  }
 }

@@ -177,7 +177,6 @@ void parse_table(char *table, icalcomponent *cal, char *tzid) {
     tbody_rows_ptr = tbody_rows_ptr->next;
   }
   fprintf(stderr, "%d rows processed.\n", row_cnt);
-  destroy_ll(tbody_rows);
   destroy_ll(head);
   return;
 }
