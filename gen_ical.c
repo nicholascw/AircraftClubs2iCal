@@ -6,8 +6,9 @@
 #include <string.h>
 
 icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
-                         char *equipment, char *tach, char *hobbs) {
-  if (!id || !date || !aircraft || !instructor || !equipment || !tach || !hobbs)
+                         char *equipment, char *tach, char *hobbs, char *tzid) {
+  if (!id || !date || !aircraft || !instructor || !equipment || !tach ||
+      !hobbs || !tzid)
     return NULL;
   struct icaltimetype dtstart, dtend;
   dtstart = icaltime_null_time();
@@ -42,7 +43,8 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
   icalcomponent *event = icalcomponent_vanew(
       ICAL_VEVENT_COMPONENT, icalproperty_new_summary(summary),
       icalproperty_new_dtstamp(dtstart), icalproperty_new_uid(id),
-      icalproperty_new_dtstart(dtstart), icalproperty_new_dtend(dtend), 0);
+      icalproperty_vanew_dtstart(dtstart, icalparameter_new_tzid(tzid), 0),
+      icalproperty_vanew_dtend(dtend, icalparameter_new_tzid(tzid), 0), 0);
   char *desc;
   asprintf(&desc,
            "ID: %s\nDate: %s\nAircraft: %s\nInstructor: %s\nEquipment: %s\n",
@@ -51,7 +53,7 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
   return event;
 }
 
-icalcomponent *gen_ical() {
+icalcomponent *gen_ical(char *tzid, char *tzurl) {
   icalcomponent *cal;
   icalproperty *prop;
   const char *my_product;
@@ -73,6 +75,11 @@ icalcomponent *gen_ical() {
    */
   my_product = "-//nicholascw/aircraftclubs2ical//EN";
   icalcomponent_add_property(cal, icalproperty_new_prodid(my_product));
+
+  icalcomponent *vtimezone = icalcomponent_new(ICAL_VTIMEZONE_COMPONENT);
+  icalcomponent_add_property(vtimezone, icalproperty_new_tzid(tzid));
+  icalcomponent_add_property(vtimezone, icalproperty_new_tzurl(tzurl));
+  icalcomponent_add_component(cal, vtimezone);
   return cal;
 }
 

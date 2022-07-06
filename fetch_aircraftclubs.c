@@ -122,7 +122,7 @@ void destroy_ll(struct ll *gg) {
   }
 }
 
-void parse_table(char *table, icalcomponent *cal) {
+void parse_table(char *table, icalcomponent *cal, char *tzid) {
   char *thead = get_element_content(table, "thead", NULL);
   if (!thead) return;
   char *thead_tr = get_element_content(thead, "tr", NULL);
@@ -169,8 +169,8 @@ void parse_table(char *table, icalcomponent *cal) {
         head_it = head_it->next;
         col_it = col_it->next;
       }
-      icalcomponent *event_this_row =
-          gen_event(id, date, aircraft, instructor, equipment, tach, hobbs);
+      icalcomponent *event_this_row = gen_event(id, date, aircraft, instructor,
+                                                equipment, tach, hobbs, tzid);
       icalcomponent_add_component(cal, event_this_row);
       destroy_ll(row_head);
     }

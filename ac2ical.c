@@ -11,10 +11,9 @@
 int main(int argc, char *argv[]) {
   int c;
   int errflg = 0;
-  char *accname = 0;
-  char *accpass = 0;
-  char *output = 0;
-  while ((c = getopt(argc, argv, "u:p:o:")) != -1) {
+  char *accname = NULL, *accpass = NULL, *output = NULL, *tzurl = NULL,
+       *tzid = NULL;
+  while ((c = getopt(argc, argv, "u:p:o:t:z:")) != -1) {
     switch (c) {
       case 'u':
         accname = optarg;
@@ -25,6 +24,12 @@ int main(int argc, char *argv[]) {
       case 'o':
         output = optarg;
         break;
+      case 't':
+        tzid = optarg;
+        break;
+      case 'z':
+        tzurl = optarg;
+        break;
       case ':':
         fprintf(stderr, "Option -%c requires an operand\n", optopt);
         errflg++;
@@ -34,10 +39,10 @@ int main(int argc, char *argv[]) {
         errflg++;
     }
   }
-  if (errflg || (!accname || !accpass || !output)) {
+  if (errflg || (!accname || !accpass || !output || !tzid || !tzurl)) {
     fprintf(stderr,
             "usage: %s -u <accname from cookie> -p <accpass from cookie> "
-            "-o <output ical filename>\n",
+            "-o <output ical filename> -t <TZID> -z <TZURL for VTIMEZONE>\n",
             argv[0]);
     exit(2);
   }
@@ -45,7 +50,7 @@ int main(int argc, char *argv[]) {
   asprintf(&cookie, "accname=%s; accpass=%s;", accname, accpass);
   char *table = fetch_aircraftclubs(cookie);
   free(cookie);
-  icalcomponent *cal = gen_ical();
-  parse_table(table, cal);
+  icalcomponent *cal = gen_ical(tzid, tzurl);
+  parse_table(table, cal, tzid);
   save_ical(cal, output);
 }
