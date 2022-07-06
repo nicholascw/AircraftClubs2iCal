@@ -47,7 +47,8 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
       icalproperty_vanew_dtend(dtend, icalparameter_new_tzid(tzid), 0), 0);
   char *desc;
   asprintf(&desc,
-           "ID: %s\nDate: %s\nAircraft: %s\nInstructor: %s\nEquipment: %s\nTach Hours: %s\nHobbs Hours: %s\n",
+           "ID: %s\nDate: %s\nAircraft: %s\nInstructor: %s\nEquipment: "
+           "%s\nTach Hours: %s\nHobbs Hours: %s\n",
            id, date, aircraft, instructor, equipment, tach, hobbs);
   icalcomponent_add_property(event, icalproperty_new_description(desc));
   return event;
