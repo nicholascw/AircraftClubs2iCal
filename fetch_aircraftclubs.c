@@ -122,7 +122,7 @@ void destroy_ll(struct ll *gg) {
   }
 }
 
-void parse_table(char *table, char *tz, icalcomponent *cal) {
+void parse_table(char *table, icalcomponent *cal) {
   char *thead = get_element_content(table, "thead", NULL);
   if (!thead) return;
   char *thead_tr = get_element_content(thead, "tr", NULL);
@@ -136,6 +136,7 @@ void parse_table(char *table, char *tz, icalcomponent *cal) {
     return;
   }
   struct ll *tbody_rows = get_element_arr(tbody, "tr");
+  free(tbody);
   int row_cnt = 0;
   struct ll *tbody_rows_ptr = tbody_rows;
   while (tbody_rows_ptr) {
@@ -143,7 +144,7 @@ void parse_table(char *table, char *tz, icalcomponent *cal) {
       row_cnt++;
       struct ll *row_head = get_element_arr(tbody_rows_ptr->str, "t");
       char *id = NULL, *date = NULL, *aircraft = NULL, *instructor = NULL,
-           *equipment = NULL;
+           *equipment = NULL, *tach = NULL, *hobbs = NULL;
       struct ll *head_it = head;
       struct ll *col_it = row_head;
       while (head_it && col_it) {
@@ -161,16 +162,23 @@ void parse_table(char *table, char *tz, icalcomponent *cal) {
           instructor = col_it->str;
         else if (!strcmp(head_it->str, "Equipment") && !equipment)
           equipment = col_it->str;
+        else if (!strcmp(head_it->str, "Tach Hours") && !tach)
+          tach = col_it->str;
+        else if (!strcmp(head_it->str, "Hobbs Hours") && !hobbs)
+          hobbs = col_it->str;
         head_it = head_it->next;
         col_it = col_it->next;
       }
       icalcomponent *event_this_row =
-          gen_event(id, date, aircraft, instructor, equipment, tz);
+          gen_event(id, date, aircraft, instructor, equipment, tach, hobbs);
       icalcomponent_add_component(cal, event_this_row);
       destroy_ll(row_head);
     }
     tbody_rows_ptr = tbody_rows_ptr->next;
   }
+  fprintf(stderr, "%d rows processed.\n", row_cnt);
+  destroy_ll(tbody_rows);
+  destroy_ll(head);
   return;
 }
 

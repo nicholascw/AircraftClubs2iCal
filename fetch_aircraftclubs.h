@@ -1,3 +1,3 @@
 #include <libical/ical.h>
 char *fetch_aircraftclubs(char *cookies);
-void parse_table(char *table, char *tz, icalcomponent *cal);
+void parse_table(char *table, icalcomponent *cal);

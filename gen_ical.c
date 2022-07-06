@@ -6,8 +6,8 @@
 #include <string.h>
 
 icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
-                         char *equipment, char *tz) {
-  if (!id || !date || !aircraft || !instructor || !equipment || !tz)
+                         char *equipment, char *tach, char *hobbs) {
+  if (!id || !date || !aircraft || !instructor || !equipment || !tach || !hobbs)
     return NULL;
   struct icaltimetype dtstart, dtend;
   dtstart = icaltime_null_time();
@@ -41,9 +41,8 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
 
   icalcomponent *event = icalcomponent_vanew(
       ICAL_VEVENT_COMPONENT, icalproperty_new_summary(summary),
-      icalproperty_new_uid(id),
-      icalproperty_vanew_dtstart(dtstart, icalparameter_new_tzid(tz), 0),
-      icalproperty_vanew_dtend(dtend, icalparameter_new_tzid(tz), 0), 0);
+      icalproperty_new_dtstamp(dtstart), icalproperty_new_uid(id),
+      icalproperty_new_dtstart(dtstart), icalproperty_new_dtend(dtend), 0);
   char *desc;
   asprintf(&desc,
            "ID: %s\nDate: %s\nAircraft: %s\nInstructor: %s\nEquipment: %s\n",
