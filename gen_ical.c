@@ -4,6 +4,7 @@
 #include <libical/ical.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
                          char *equipment, char *tach, char *hobbs, char *tzid) {
@@ -40,9 +41,11 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
            (has_equipment && (has_aircraft || has_instructor) ? ", " : ""),
            (has_equipment ? equipment : ""));
 
+  char *epoch_n_id;
+  asprintf(&epoch_n_id, "%lun%s",(unsigned long)time(NULL), id);
   icalcomponent *event = icalcomponent_vanew(
       ICAL_VEVENT_COMPONENT, icalproperty_new_summary(summary),
-      icalproperty_new_dtstamp(dtstart), icalproperty_new_uid(id),
+      icalproperty_new_dtstamp(dtstart), icalproperty_new_uid(epoch_n_id),
       icalproperty_vanew_dtstart(dtstart, icalparameter_new_tzid(tzid), 0),
       icalproperty_vanew_dtend(dtend, icalparameter_new_tzid(tzid), 0), 0);
   char *desc;
