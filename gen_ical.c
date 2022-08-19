@@ -42,7 +42,7 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
            (has_equipment ? equipment : ""));
 
   char *epoch_n_id;
-  asprintf(&epoch_n_id, "%lun%s",(unsigned long)time(NULL), id);
+  asprintf(&epoch_n_id, "%lun%s", (unsigned long)time(NULL), id);
   icalcomponent *event = icalcomponent_vanew(
       ICAL_VEVENT_COMPONENT, icalproperty_new_summary(summary),
       icalproperty_new_dtstamp(dtstart), icalproperty_new_uid(epoch_n_id),
