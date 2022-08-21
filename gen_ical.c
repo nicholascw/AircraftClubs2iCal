@@ -12,7 +12,7 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
       !hobbs || !tzid)
     return NULL;
   icaltimezone *tz = icaltimezone_get_builtin_timezone_from_tzid(tzid);
-  if(!tz) return NULL;
+  if (!tz) return NULL;
   struct icaltimetype dtstart, dtend;
   dtstart = icaltime_null_time();
   dtend = icaltime_null_time();
@@ -83,7 +83,7 @@ icalcomponent *gen_ical(char *tzid) {
   my_product = "-//nicholascw/aircraftclubs2ical//EN";
   icalcomponent_add_property(cal, icalproperty_new_prodid(my_product));
   icaltimezone *tz = icaltimezone_get_builtin_timezone_from_tzid(tzid);
-  if(!tz) return NULL;
+  if (!tz) return NULL;
   icalcomponent *vtimezone = icaltimezone_get_component(tz);
   icalcomponent_add_component(cal, vtimezone);
   return cal;
