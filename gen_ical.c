@@ -11,6 +11,8 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
   if (!id || !date || !aircraft || !instructor || !equipment || !tach ||
       !hobbs || !tzid)
     return NULL;
+  icaltimezone *tz = icaltimezone_get_builtin_timezone_from_tzid(tzid);
+  if(!tz) return NULL;
   struct icaltimetype dtstart, dtend;
   dtstart = icaltime_null_time();
   dtend = icaltime_null_time();
@@ -41,13 +43,14 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
            (has_equipment && (has_aircraft || has_instructor) ? ", " : ""),
            (has_equipment ? equipment : ""));
 
-  char *epoch_n_id;
-  asprintf(&epoch_n_id, "%lun%s", (unsigned long)time(NULL), id);
+  // char *epoch_n_id;
+  // asprintf(&epoch_n_id, "%lu-%s", (unsigned long)time(NULL), id);
   icalcomponent *event = icalcomponent_vanew(
       ICAL_VEVENT_COMPONENT, icalproperty_new_summary(summary),
-      icalproperty_new_dtstamp(dtstart), icalproperty_new_uid(epoch_n_id),
+      icalproperty_new_dtstamp(dtstart), icalproperty_new_uid(id),
       icalproperty_vanew_dtstart(dtstart, icalparameter_new_tzid(tzid), 0),
-      icalproperty_vanew_dtend(dtend, icalparameter_new_tzid(tzid), 0), 0);
+      icalproperty_vanew_dtend(dtend, icalparameter_new_tzid(tzid), 0),
+      icalproperty_new_lastmodified(icaltime_current_time_with_zone(tz)), 0);
   char *desc;
   asprintf(&desc,
            "ID: %s\nDate: %s\nAircraft: %s\nInstructor: %s\nEquipment: "
@@ -57,7 +60,7 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
   return event;
 }
 
-icalcomponent *gen_ical(char *tzid, char *tzurl) {
+icalcomponent *gen_ical(char *tzid) {
   icalcomponent *cal;
   icalproperty *prop;
   const char *my_product;
@@ -79,10 +82,9 @@ icalcomponent *gen_ical(char *tzid, char *tzurl) {
    */
   my_product = "-//nicholascw/aircraftclubs2ical//EN";
   icalcomponent_add_property(cal, icalproperty_new_prodid(my_product));
-
-  icalcomponent *vtimezone = icalcomponent_new(ICAL_VTIMEZONE_COMPONENT);
-  icalcomponent_add_property(vtimezone, icalproperty_new_tzid(tzid));
-  icalcomponent_add_property(vtimezone, icalproperty_new_tzurl(tzurl));
+  icaltimezone *tz = icaltimezone_get_builtin_timezone_from_tzid(tzid);
+  if(!tz) return NULL;
+  icalcomponent *vtimezone = icaltimezone_get_component(tz);
   icalcomponent_add_component(cal, vtimezone);
   return cal;
 }

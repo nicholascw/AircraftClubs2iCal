@@ -11,9 +11,8 @@
 int main(int argc, char *argv[]) {
   int c;
   int errflg = 0;
-  char *accname = NULL, *accpass = NULL, *output = NULL, *tzurl = NULL,
-       *tzid = NULL;
-  while ((c = getopt(argc, argv, "u:p:o:t:z:")) != -1) {
+  char *accname = NULL, *accpass = NULL, *output = NULL, *tzid = NULL;
+  while ((c = getopt(argc, argv, "u:p:o:t:")) != -1) {
     switch (c) {
       case 'u':
         accname = optarg;
@@ -27,22 +26,19 @@ int main(int argc, char *argv[]) {
       case 't':
         tzid = optarg;
         break;
-      case 'z':
-        tzurl = optarg;
-        break;
       case ':':
         fprintf(stderr, "Option -%c requires an operand\n", optopt);
         errflg++;
         break;
       case '?':
-        fprintf(stderr, "Unrecognized option: '-%c'\n", optopt);
+        fprintf(stderr, "Unrecognized or deprecated option: '-%c'\n", optopt);
         errflg++;
     }
   }
-  if (errflg || (!accname || !accpass || !output || !tzid || !tzurl)) {
+  if (errflg || (!accname || !accpass || !output || !tzid)) {
     fprintf(stderr,
             "usage: %s -u <accname from cookie> -p <accpass from cookie> "
-            "-o <output ical filename> -t <TZID> -z <TZURL for VTIMEZONE>\n",
+            "-o <output ical filename> -t <TZID>\n",
             argv[0]);
     exit(2);
   }
@@ -50,7 +46,7 @@ int main(int argc, char *argv[]) {
   asprintf(&cookie, "accname=%s; accpass=%s;", accname, accpass);
   char *table = fetch_aircraftclubs(cookie);
   free(cookie);
-  icalcomponent *cal = gen_ical(tzid, tzurl);
+  icalcomponent *cal = gen_ical(tzid);
   parse_table(table, cal, tzid);
   save_ical(cal, output);
 }

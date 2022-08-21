@@ -16,11 +16,11 @@ Login your aircraftclubs.com account and tick "Remember Me". Copy values of `acc
 Then,
 
 ```bash
-$ ./ac2ical -u <accname from cookie> -p <accpass from cookie> -o <output ical filename> -t <timezone id> -z <timezone info URL in VTIMEZONE format>
+$ ./ac2ical -u <accname from cookie> -p <accpass from cookie> -o <output ical filename> -t <tzid of timezone>
 ```
 
 For example,
 ```cron
-0 0 * * * /path/to/ac2ical -u johndoe -p deadbeef...deadbeef -o /var/www/johndoe.reservations.ics -t America/New_York -z https://static.tzurl.org/zoneinfo/America/New_York.ics
+0 0 * * * /path/to/ac2ical -u johndoe -p deadbeef...deadbeef -o /var/www/johndoe.reservations.ics -t America/New_York
 ```
 and run any HTTP server you desire with root points to `/var/www` and listen on `example.com` should help you easily subscribe this calendar in Google Calendar or other services with link `https://example.com/johndoe.reservations.ics`.
