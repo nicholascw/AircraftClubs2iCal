@@ -2,6 +2,7 @@
 #define _GNU_SOURCE
 #endif
 #include <libical/ical.h>
+#include <libical/icaltimezone.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -83,7 +84,10 @@ icalcomponent *gen_ical(char *tzid) {
   my_product = "-//nicholascw/aircraftclubs2ical//EN";
   icalcomponent_add_property(cal, icalproperty_new_prodid(my_product));
   icaltimezone *tz = icaltimezone_get_builtin_timezone_from_tzid(tzid);
-  if (!tz) return NULL;
+  if (!tz) {
+    fprintf(stderr, "TZID not found!\n");
+    return NULL;
+  }
   icalcomponent *vtimezone = icaltimezone_get_component(tz);
   icalcomponent_add_component(cal, vtimezone);
   return cal;
@@ -91,10 +95,24 @@ icalcomponent *gen_ical(char *tzid) {
 
 void save_ical(icalcomponent *cal, char *path) {
   FILE *f = fopen(path, "w+");
-  if (f) {
-    fprintf(f, "%s", icalcomponent_as_ical_string(cal));
+  char *ical_str = icalcomponent_as_ical_string(cal);
+  if (f && ical_str) {
+    fprintf(f, "%s", ical_str);
     fclose(f);
   } else {
-    fprintf(stderr, "Failed to open path %s\n", path);
+    fprintf(stderr,
+            "Failed to open path %s or error occured in "
+            "icalcomponent_as_ical_string().\n",
+            path);
+  }
+}
+
+void print_tzids() {
+  icalarray *arr = icaltimezone_get_builtin_timezones();
+  if (arr && arr->num_elements > 0) {
+    for (size_t i = 0; i < arr->num_elements; i++) {
+      icaltimezone *this_tz = icalarray_element_at(arr, i);
+      printf("%s\n", icaltimezone_get_tzid(this_tz));
+    }
   }
 }

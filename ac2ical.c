@@ -12,8 +12,13 @@ int main(int argc, char *argv[]) {
   int c;
   int errflg = 0;
   char *accname = NULL, *accpass = NULL, *output = NULL, *tzid = NULL;
-  while ((c = getopt(argc, argv, "u:p:o:t:")) != -1) {
+  while ((c = getopt(argc, argv, "lu:p:o:t:")) != -1) {
     switch (c) {
+      case 'l':
+        // list tzid
+        print_tzids();
+        exit(4);
+        break;
       case 'u':
         accname = optarg;
         break;
@@ -38,15 +43,17 @@ int main(int argc, char *argv[]) {
   if (errflg || (!accname || !accpass || !output || !tzid)) {
     fprintf(stderr,
             "usage: %s -u <accname from cookie> -p <accpass from cookie> "
-            "-o <output ical filename> -t <TZID>\n",
-            argv[0]);
+            "-o <output ical filename> -t <TZID>\n"
+            "   or: %s -l to list all available TZIDs.\n",
+            argv[0], argv[0]);
     exit(2);
   }
+  icalcomponent *cal = gen_ical(tzid);
+  if (!cal) exit(3);
   char *cookie;
   asprintf(&cookie, "accname=%s; accpass=%s;", accname, accpass);
   char *table = fetch_aircraftclubs(cookie);
   free(cookie);
-  icalcomponent *cal = gen_ical(tzid);
   parse_table(table, cal, tzid);
   save_ical(cal, output);
 }
