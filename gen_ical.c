@@ -101,7 +101,7 @@ void save_ical(icalcomponent *cal, char *path) {
     fclose(f);
   } else {
     fprintf(stderr,
-            "Failed to open path %s or error occured in "
+            "Failed to open path %s or error occurred in "
             "icalcomponent_as_ical_string().\n",
             path);
   }
