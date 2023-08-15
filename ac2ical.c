@@ -12,7 +12,8 @@ int main(int argc, char *argv[]) {
   int c;
   int errflg = 0;
   char *accname = NULL, *accpass = NULL, *output = NULL, *tzid = NULL;
-  while ((c = getopt(argc, argv, "lu:p:o:t:")) != -1) {
+  char *other_mid = NULL;
+  while ((c = getopt(argc, argv, "lu:p:o:t:m:")) != -1) {
     switch (c) {
       case 'l':
         // list tzid
@@ -31,6 +32,9 @@ int main(int argc, char *argv[]) {
       case 't':
         tzid = optarg;
         break;
+      case 'm':
+        other_mid = optarg;
+        break;
       case ':':
         fprintf(stderr, "Option -%c requires an operand\n", optopt);
         errflg++;
@@ -43,7 +47,7 @@ int main(int argc, char *argv[]) {
   if (errflg || (!accname || !accpass || !output || !tzid)) {
     fprintf(stderr,
             "usage: %s -u <accname from cookie> -p <accpass from cookie> "
-            "-o <output ical filename> -t <TZID>\n"
+            "-o <output ical filename> -t <TZID> [-m <other member's id>]\n"
             "   or: %s -l to list all available TZIDs.\n",
             argv[0], argv[0]);
     exit(2);
@@ -52,7 +56,7 @@ int main(int argc, char *argv[]) {
   if (!cal) exit(3);
   char *cookie;
   asprintf(&cookie, "accname=%s; accpass=%s;", accname, accpass);
-  char *table = fetch_aircraftclubs(cookie);
+  char *table = fetch_aircraftclubs(cookie, other_mid);
   free(cookie);
   parse_table(table, cal, tzid);
   save_ical(cal, output);

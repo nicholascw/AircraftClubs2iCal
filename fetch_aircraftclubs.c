@@ -27,7 +27,7 @@ void destroy_ll(struct ll *gg);
 char curl_errbuf[CURL_ERROR_SIZE];
 struct memory chunk = {0};
 
-char *fetch_aircraftclubs(char *cookies) {
+char *fetch_aircraftclubs(char *cookies, char *other_mid) {
   curl_global_init(CURL_GLOBAL_SSL);
   CURL *curl = curl_easy_init();
   if (curl) {
@@ -54,33 +54,38 @@ char *fetch_aircraftclubs(char *cookies) {
     if (rcode != 200) exit(1);
 
     // get member id
-    char *mid = strstr(chunk.response, "/pages/edit/member.php?id=");
-    if (!mid) {
-      fprintf(stderr, "Failed to locate member id\n");
-      exit(1);
+    char *member_id = NULL;
+    if (other_mid) {
+      member_id = strdup(other_mid);
+    } else {
+      char *mid = strstr(chunk.response, "/pages/edit/member.php?id=");
+      if (!mid) {
+        fprintf(stderr, "Failed to locate member id\n");
+        exit(1);
+      }
+      mid += strlen("/pages/edit/member.php?id=");
+      char *mid_end = strstr(mid, "';");
+      if (!mid_end || mid_end - mid <= 0) {
+        fprintf(stderr, "Failed to locate member id\n");
+        exit(1);
+      }
+      member_id = strndup(mid, mid_end - mid);
     }
-    mid += strlen("/pages/edit/member.php?id=");
-    char *mid_end = strstr(mid, "';");
-    if (!mid_end || mid_end - mid <= 0) {
-      fprintf(stderr, "Failed to locate member id\n");
-      exit(1);
-    }
-    char *member_id = strndup(mid, mid_end - mid);
     printf("member id: %s\n", member_id);
 
     // get PHPSESSID
-    mid = strstr(chunk.response, "PHPSESSID=");
-    if (!mid) {
+    char *sessid = strstr(chunk.response, "PHPSESSID=");
+    if (!sessid) {
       fprintf(stderr, "Failed to locate PHPSESSID\n");
       exit(1);
     }
-    mid += strlen("PHPSESSID=");
-    mid_end = strstr(mid, ";");
-    if (!mid_end || mid_end - mid <= 0) {
+    sessid += strlen("PHPSESSID=");
+    char *sessid_end = strstr(sessid, ";");
+    if (!sessid_end || sessid_end - sessid <= 0) {
       fprintf(stderr, "Failed to locate PHPSESSID\n");
       exit(1);
     }
-    char *PHPSESSID = strndup(mid, mid_end - mid);
+    char *PHPSESSID = strndup(sessid, sessid_end - sessid);
     printf("PHPSESSID: %s\n", PHPSESSID);
 
     free(chunk.response);
