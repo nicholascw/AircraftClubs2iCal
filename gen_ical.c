@@ -53,10 +53,16 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
       icalproperty_vanew_dtend(dtend, icalparameter_new_tzid(tzid), 0),
       icalproperty_new_lastmodified(icaltime_current_time_with_zone(tz)), 0);
   char *desc;
+
+  time_t rawtime;
+  struct tm *timeinfo;
+  time(&rawtime);
+  timeinfo = localtime(&rawtime);
   asprintf(&desc,
            "ID: %s\nDate: %s\nAircraft: %s\nInstructor: %s\nEquipment: "
-           "%s\nTach Hours: %s\nHobbs Hours: %s\n",
-           id, date, aircraft, instructor, equipment, tach, hobbs);
+           "%s\nTach Hours: %s\nHobbs Hours: %s\nFetched at: %s\n",
+           id, date, aircraft, instructor, equipment, tach, hobbs,
+           asctime(timeinfo));
   icalcomponent_add_property(event, icalproperty_new_description(desc));
   return event;
 }
