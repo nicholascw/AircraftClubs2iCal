@@ -5,3 +5,4 @@ config*.h
 vgcore.*
 obj/*
 ac2ical
+*.customized
