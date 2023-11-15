@@ -58,11 +58,12 @@ icalcomponent *gen_event(char *id, char *date, char *aircraft, char *instructor,
   struct tm *timeinfo;
   time(&rawtime);
   timeinfo = localtime(&rawtime);
+  char ts_buf[128];
+  ts_buf[strftime(ts_buf, 128, "%FT%T%z (%A)", timeinfo)] = '\0';
   asprintf(&desc,
            "ID: %s\nDate: %s\nAircraft: %s\nInstructor: %s\nEquipment: "
            "%s\nTach Hours: %s\nHobbs Hours: %s\nFetched at: %s\n",
-           id, date, aircraft, instructor, equipment, tach, hobbs,
-           asctime(timeinfo));
+           id, date, aircraft, instructor, equipment, tach, hobbs, ts_buf);
   icalcomponent_add_property(event, icalproperty_new_description(desc));
   return event;
 }
